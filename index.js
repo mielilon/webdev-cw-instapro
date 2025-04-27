@@ -4,13 +4,14 @@ import { renderAuthPageComponent } from './components/auth-page-component.js'
 import { ADD_POSTS_PAGE, AUTH_PAGE, LOADING_PAGE, POSTS_PAGE, USER_POSTS_PAGE } from './routes.js'
 import { renderPostsPageComponent } from './components/posts-page-component.js'
 import { renderLoadingPageComponent } from './components/loading-page-component.js'
-import { getUserFromLocalStorage, removeUserFromLocalStorage, saveUserToLocalStorage } from './helpers.js'
+import { getUserFromLocalStorage, removeUserFromLocalStorage, saveUserToLocalStorage } from './helpers'
 
 import { formatDistanceToNow } from 'date-fns'
 
 export let user = getUserFromLocalStorage()
 export let page = null
 export let posts = []
+console.log('Начало работы');
 
 const getToken = () => {
     const token = user ? `Bearer ${user.token}` : undefined
