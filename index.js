@@ -1,6 +1,6 @@
-import { getPosts } from "./api.js";
-import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
-import { renderAuthPageComponent } from "./components/auth-page-component.js";
+import { getPosts } from "./api";
+import { renderAddPostPageComponent } from "./components/add-post-page-component";
+import { renderAuthPageComponent } from "./components/auth-page-component";
 import {
   ADD_POSTS_PAGE,
   AUTH_PAGE,
@@ -8,13 +8,13 @@ import {
   POSTS_PAGE,
   USER_POSTS_PAGE,
 } from "./routes.js";
-import { renderPostsPageComponent } from "./components/posts-page-component.js";
-import { renderLoadingPageComponent } from "./components/loading-page-component.js";
+import { renderPostsPageComponent } from "./components/posts-page-component";
+import { renderLoadingPageComponent } from "./components/loading-page-component";
 import {
   getUserFromLocalStorage,
   removeUserFromLocalStorage,
   saveUserToLocalStorage,
-} from "./helpers.js";
+} from "./helpers";
 
 export let user = getUserFromLocalStorage();
 export let page = null;
