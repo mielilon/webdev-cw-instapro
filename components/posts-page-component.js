@@ -21,6 +21,7 @@ export function renderPostsPageComponent({ appEl }) {
             const listEl = document.createElement('li')
             listEl.classList.add('post')
             const formattedDate = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ru })
+            console.log(formattedDate);
 
             listEl.innerHTML = `
                 <div class="post-header" data-user-id="${post.user.id}">
@@ -42,8 +43,9 @@ export function renderPostsPageComponent({ appEl }) {
                     <span class="user-name">${post.user.name}</span>
                     ${post.description}
                 </p>
-                <p class="post-date">${formattedDate}</p>
+                <p class="post-date">${post.formattedDate}</p>
             `
+            // console.log(post.createdAt);
             containerPosts.appendChild(listEl)
         })
     }
