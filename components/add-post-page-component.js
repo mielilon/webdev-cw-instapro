@@ -4,7 +4,10 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
     const appHtml = `
     <div class="page-container">
       <div class="header-container"></div>
-      Cтраница добавления поста
+      <label for="file-upload-label secondary-button">
+      <input type="file" class="file-upload-input" style="display:none">
+    </label>
+      Cтраница добавления поста коментария
       <button class="button" id="add-button">Добавить</button>
     </div>
   `;
