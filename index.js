@@ -1,4 +1,4 @@
-import { getPosts } from "./api.js";
+import { getPosts, getUserPosts, } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
 import {
@@ -21,7 +21,7 @@ export let page = null;
 export let posts = [];
 
 const getToken = () => {
-  const token = user ? `Bearer ${user.token}` : undefined;
+  const token = user && user.token ? `Bearer ${user.token}` : undefined;
   return token;
 };
 
@@ -31,9 +31,7 @@ export const logout = () => {
   goToPage(POSTS_PAGE);
 };
 
-/**
- * Включает страницу приложения
- */
+
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -45,46 +43,72 @@ export const goToPage = (newPage, data) => {
     ].includes(newPage)
   ) {
     if (newPage === ADD_POSTS_PAGE) {
-      /* Если пользователь не авторизован, то отправляем его на страницу авторизации перед добавлением поста */
       page = user ? ADD_POSTS_PAGE : AUTH_PAGE;
-      return renderApp();
+      renderApp();
+      return;
     }
 
     if (newPage === POSTS_PAGE) {
       page = LOADING_PAGE;
       renderApp();
 
-      return getPosts({ token: getToken() })
+      getPosts({ token: getToken() })
         .then((newPosts) => {
           page = POSTS_PAGE;
           posts = newPosts;
           renderApp();
         })
         .catch((error) => {
-          console.error(error);
-          goToPage(POSTS_PAGE);
+          console.error("Error fetching posts:", error);
+          page = POSTS_PAGE;
+          posts = [];
+          renderApp();
+          const appEl = document.getElementById("app");
+          const errorEl = document.createElement("div");
+          errorEl.className = "error-message";
+          errorEl.textContent = `Не удалось загрузить посты: ${error.message}. Попробуйте позже.`;
+          appEl.appendChild(errorEl);
         });
+      return;
     }
 
     if (newPage === USER_POSTS_PAGE) {
-      // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      page = LOADING_PAGE;
+      renderApp();
+
+      getUserPosts({ token: getToken(), userId: data.userId })
+        .then((newPosts) => {
+          page = USER_POSTS_PAGE;
+          posts = newPosts;
+          renderApp();
+        })
+        .catch((error) => {
+          console.error("Error fetching user posts:", error);
+          page = POSTS_PAGE;
+          posts = [];
+          renderApp();
+          const appEl = document.getElementById("app");
+          const errorEl = document.createElement("div");
+          errorEl.className = "error-message";
+          errorEl.textContent = `Не удалось загрузить посты пользователя: ${error.message}. Попробуйте позже.`;
+          appEl.appendChild(errorEl);
+        });
+      return;
     }
 
     page = newPage;
     renderApp();
-
     return;
   }
 
-  throw new Error("страницы не существует");
+  console.error("Unknown page:", newPage);
+  const appEl = document.getElementById("app");
+  appEl.innerHTML = `<div class="page-container">Ошибка: неизвестная страница</div>`;
 };
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
+
   if (page === LOADING_PAGE) {
     return renderLoadingPageComponent({
       appEl,
@@ -110,24 +134,18 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       onAddPostClick({ description, imageUrl }) {
-        // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
         goToPage(POSTS_PAGE);
       },
     });
   }
 
-  if (page === POSTS_PAGE) {
+  if (page === POSTS_PAGE || page === USER_POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
     });
   }
 
-  if (page === USER_POSTS_PAGE) {
-    // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
-  }
+  appEl.innerHTML = `<div class="page-container">Ошибка: неизвестная страница</div>`;
 };
 
 goToPage(POSTS_PAGE);
