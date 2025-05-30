@@ -41,10 +41,14 @@ body::-webkit-scrollbar {
 p {
   margin: 0;
 }
-
+#add-button {
+  width: 100%;
+}
 .button,
 .secondary-button {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px 13px 13px;
   font-size: 18px;
   line-height: 22px;
@@ -92,7 +96,8 @@ p {
 }
 
 .input {
-  height: 36px;
+  /* height: 36px; */
+  resize: none;
   box-sizing: border-box;
   padding: 15px;
   font-size: 14px;
@@ -101,6 +106,7 @@ p {
   border: none;
   border-radius: 5px;
   background-color: #e8e8e8;
+  margin-bottom: 10px;
 }
 
 .input .-error {

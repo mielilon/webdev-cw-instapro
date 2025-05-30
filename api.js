@@ -5,7 +5,6 @@ import { renderPostsPageComponent } from './components/posts-page-component.js'
 const personalKey = 'prod'
 const baseHost = 'https://webdev-hw-api.vercel.app'
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`
- 
 
 export function getAllPosts() {
     return fetch(postsHost)
@@ -17,13 +16,11 @@ export function getAllPosts() {
         .then((responseData) => {
             console.log(responseData)
             renderPostsPageComponent()
-             const commentsApi = responseData
-             return commentsApi
-
+            const commentsApi = responseData
+            return commentsApi
         })
         .catch((error) => console.error(error.message))
 }
-
 
 export function getPosts({ token }) {
     return fetch(postsHost, {
@@ -76,8 +73,30 @@ export function loginUser({ login, password }) {
     })
 }
 
+export function postImage({ file }) {
+    console.log('запуск пост img');
+    const data = new FormData();
+    data.append("file", file);
+
+    return fetch(baseHost + "/api/upload/image", {
+        method: "POST",
+        body: data,
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error('Сеть ответила с ошибкой ' + response.status);
+        }
+        return response.json();
+    })
+    .then((data) => {
+        return data.fileUrl; // возвращаем URL загруженного изображения
+    });
+}
+
+
 // Загружает картинку в облако, возвращает url загруженной картинки
 export function uploadImage({ file }) {
+    console.log('функция загрузки файлы загружена')
     const data = new FormData()
     data.append('file', file)
 
