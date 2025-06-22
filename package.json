@@ -1,0 +1,31 @@
+{
+  "name": "webdev-cw-instapro",
+  "version": "1.0.0",
+  "description": "MVP социальной сети для обмена фотографиями",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Veritas-lab/webdev-cw-instapro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Veritas-lab/webdev-cw-instapro/issues"
+  },
+  "homepage": "https://github.com/Veritas-lab/webdev-cw-instapro#readme",
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3"
+  }
+}
