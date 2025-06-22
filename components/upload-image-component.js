@@ -1,80 +1,62 @@
-import { uploadImage } from "../api.js";
+import { renderUploadImageComponent } from "./upload-image-component.js"
 
-/**
- * Компонент загрузки изображения.
- * Этот компонент позволяет пользователю загружать изображение и отображать его превью.
- * Если изображение уже загружено, пользователь может заменить его.
- *
- * @param {HTMLElement} params.element - HTML-элемент, в который будет рендериться компонент.
- * @param {Function} params.onImageUrlChange - Функция, вызываемая при изменении URL изображения.
- *                                            Принимает один аргумент - новый URL изображения или пустую строку.
- */
-export function renderUploadImageComponent({ element, onImageUrlChange }) {
-  /**
-   * URL текущего изображения.
-   * Изначально пуст, пока пользователь не загрузит изображение.
-   * @type {string}
-   */
-  let imageUrl = "";
+export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
+    let imageUrl = ""
 
-  /**
-   * Функция рендеринга компонента.
-   * Отображает интерфейс компонента в зависимости от состояния: 
-   * либо форма выбора файла, либо превью загруженного изображения с кнопкой замены.
-   */
-  const render = () => {
-    element.innerHTML = `
-      <div class="upload-image">
-        ${
-          imageUrl
-            ? `
-            <div class="file-upload-image-container">
-              <img class="file-upload-image" src="${imageUrl}" alt="Загруженное изображение">
-              <button class="file-upload-remove-button button">Заменить фото</button>
-            </div>
-            `
-            : `
-            <label class="file-upload-label secondary-button">
-              <input
-                type="file"
-                class="file-upload-input"
-                style="display:none"
-              />
-              Выберите фото
-            </label>
-          `
-        }
+    const render = () => {
+        const appHtml = `
+    <div class="page-container">
+      <div class="header-container"></div>
+      <div class="form">
+        <h2>Добавить пост</h2>
+        <div class="form-inputs">
+          <textarea 
+            id="post-description" 
+            class="textarea" 
+            placeholder="Описание поста..." 
+            rows="4"
+          ></textarea>
+          
+          <div class="upload-image-container"></div>
+        </div>
+        <button class="button" id="add-button">Добавить</button>
       </div>
-    `;
+    </div>
+    `
 
-    // Обработчик выбора файла
-    const fileInputElement = element.querySelector(".file-upload-input");
-    fileInputElement?.addEventListener("change", () => {
-      const file = fileInputElement.files[0];
-      if (file) {
-        const labelEl = document.querySelector(".file-upload-label");
-        labelEl.setAttribute("disabled", true);
-        labelEl.textContent = "Загружаю файл...";
-        
-        // Загружаем изображение с помощью API
-        uploadImage({ file }).then(({ fileUrl }) => {
-          imageUrl = fileUrl; // Сохраняем URL загруженного изображения
-          onImageUrlChange(imageUrl); // Уведомляем о изменении URL изображения
-          render(); // Перерисовываем компонент с новым состоянием
-        });
-      }
-    });
+        appEl.innerHTML = appHtml
 
-    // Обработчик удаления изображения
-    element
-      .querySelector(".file-upload-remove-button")
-      ?.addEventListener("click", () => {
-        imageUrl = ""; // Сбрасываем URL изображения
-        onImageUrlChange(imageUrl); // Уведомляем об изменении URL изображения
-        render(); // Перерисовываем компонент
-      });
-  };
+        const uploadImageContainer = appEl.querySelector(
+            ".upload-image-container",
+        )
+        renderUploadImageComponent({
+            element: uploadImageContainer,
+            onImageUrlChange(newImageUrl) {
+                imageUrl = newImageUrl
+            },
+        })
 
-  // Инициализация компонента
-  render();
+        document.getElementById("add-button").addEventListener("click", () => {
+            const description = document
+                .getElementById("post-description")
+                .value.trim()
+
+            if (!imageUrl) {
+                alert("Пожалуйста, загрузите изображение")
+                return
+            }
+
+            if (!description) {
+                alert("Пожалуйста, введите описание поста")
+                return
+            }
+
+            onAddPostClick({
+                description: description,
+                imageUrl: imageUrl,
+            })
+        })
+    }
+
+    render()
 }
