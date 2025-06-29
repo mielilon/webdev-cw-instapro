@@ -1,23 +1,51 @@
-export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
-  const render = () => {
-    // @TODO: Реализовать страницу добавления поста
-    const appHtml = `
-    <div class="page-container">
-      <div class="header-container"></div>
-      Cтраница добавления поста
-      <button class="button" id="add-button">Добавить</button>
-    </div>
-  `;
+import { renderHeaderComponent } from "./header-component.js"
+import { renderUploadImageComponent } from "./upload-image-component.js"
 
-    appEl.innerHTML = appHtml;
+export function renderAddPostPageComponent({ appEl, user, onAddPostClick }) {
+    let imageUrl = ""
 
-    document.getElementById("add-button").addEventListener("click", () => {
-      onAddPostClick({
-        description: "Описание картинки",
-        imageUrl: "https://image.png",
-      });
-    });
-  };
+    const render = () => {
+        // @TODO: Реализовать страницу добавления поста(Готово)
+        appEl.innerHTML = `
+      <div class="page-container">
+        <div class="header-container"></div>
+        <h2>Добавить пост</h2>
+        <div class="upload-image-container"></div>
+        <input
+          type="text"
+          id="description-input"
+          placeholder="Добавьте описание"
+          class="description-input"
+        />
+        <button class="button" id="add-button">Добавить</button>
+      </div>
+    `
 
-  render();
+        renderHeaderComponent({
+            element: document.querySelector(".header-container"),
+            user,
+        })
+
+        renderUploadImageComponent({
+            element: document.querySelector(".upload-image-container"),
+            onImageUrlChange: (newImageUrl) => {
+                imageUrl = newImageUrl
+            },
+        })
+
+        document.getElementById("add-button").addEventListener("click", () => {
+            const description = document
+                .getElementById("description-input")
+                .value.trim()
+
+            if (!description || !imageUrl) {
+                alert("Добавьте описание и выберите картинку")
+                return
+            }
+
+            onAddPostClick({ description, imageUrl })
+        })
+    }
+
+    render()
 }
