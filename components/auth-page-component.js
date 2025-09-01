@@ -102,16 +102,22 @@ export function renderAuthPageComponent({ appEl, setUser }) {
 
       if (isLoginMode) {
         // Обработка входа
-        const login = document.getElementById("login-input").value;
+        const login = document.getElementById("login-input").value.trim();
         const password = document.getElementById("password-input").value;
 
+        // Проверяем, заполнены ли поля
+        if (!login && !password) {
+          setError("Введите логин и пароль");
+          return;
+        }
+
         if (!login) {
-          alert("Введите логин");
+          setError("Введите логин");
           return;
         }
 
         if (!password) {
-          alert("Введите пароль");
+          setError("Введите пароль");
           return;
         }
 
@@ -120,41 +126,68 @@ export function renderAuthPageComponent({ appEl, setUser }) {
             setUser(user.user);
           })
           .catch((error) => {
-            console.warn(error);
             setError(error.message);
           });
       } else {
         // Обработка регистрации
-        const login = document.getElementById("login-input").value;
-        const name = document.getElementById("name-input").value;
+        const login = document.getElementById("login-input").value.trim();
+        const name = document.getElementById("name-input").value.trim();
         const password = document.getElementById("password-input").value;
 
+        // Проверяем, заполнены ли обязательные поля
+        const emptyFields = [];
+
         if (!name) {
-          alert("Введите имя");
-          return;
+          emptyFields.push("имя");
         }
 
         if (!login) {
-          alert("Введите логин");
-          return;
+          emptyFields.push("логин");
         }
 
         if (!password) {
-          alert("Введите пароль");
+          emptyFields.push("пароль");
+        }
+
+        // Если есть пустые поля, показываем общую ошибку
+        if (emptyFields.length > 0) {
+          if (emptyFields.length === 1) {
+            setError(`Введите ${emptyFields[0]}`);
+          } else if (emptyFields.length === 2) {
+            setError(`Введите ${emptyFields[0]} и ${emptyFields[1]}`);
+          } else {
+            setError(
+              `Введите ${emptyFields.slice(0, -1).join(", ")} и ${
+                emptyFields[emptyFields.length - 1]
+              }`
+            );
+          }
           return;
         }
 
-        if (!imageUrl) {
-          alert("Не выбрана фотография");
+        // Проверяем длину логина
+        if (login.length < 3) {
+          setError("Логин должен содержать минимум 3 символа");
           return;
         }
+
+        // Проверяем длину пароля
+        if (password.length < 6) {
+          setError("Пароль должен содержать минимум 6 символов");
+          return;
+        }
+
+        // Убираем обязательность изображения для тестирования
+        // if (!imageUrl) {
+        //   setError("Не выбрана фотография");
+        //   return;
+        // }
 
         registerUser({ login, password, name, imageUrl })
           .then((user) => {
             setUser(user.user);
           })
           .catch((error) => {
-            console.warn(error);
             setError(error.message);
           });
       }
