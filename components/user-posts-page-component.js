@@ -3,6 +3,13 @@ import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage, user } from "../index.js";
 import { likePost, dislikePost, deletePost } from "../api.js";
 
+// Функция для экранирования HTML
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 export function renderUserPostsPageComponent({ appEl, userId }) {
   // Функция для форматирования даты
   const formatDate = (dateString) => {
@@ -27,26 +34,30 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
     .map(
       (post) => `
     <li class="post">
-      <div class="post-header" data-user-id="${post.user.id}">
-        <img src="${post.user.imageUrl}" class="post-header__user-image">
-        <p class="post-header__user-name">${post.user.name}</p>
+      <div class="post-header" data-user-id="${escapeHtml(post.user.id)}">
+        <img src="${escapeHtml(
+          post.user.imageUrl
+        )}" class="post-header__user-image" alt="Фото пользователя">
+        <p class="post-header__user-name">${escapeHtml(post.user.name)}</p>
       </div>
       <div class="post-image-container">
-        <img class="post-image" src="${post.imageUrl}">
+        <img class="post-image" src="${escapeHtml(
+          post.imageUrl
+        )}" alt="Фото поста">
       </div>
       <div class="post-likes">
-        <button data-post-id="${post.id}" class="like-button">
+        <button data-post-id="${escapeHtml(post.id)}" class="like-button">
           <img src="./assets/images/${
             post.isLiked ? "like-active" : "like-not-active"
-          }.svg">
+          }.svg" alt="${post.isLiked ? "Убрать лайк" : "Поставить лайк"}">
         </button>
         <p class="post-likes-text">
           Нравится: <strong>${post.likes.length}</strong>
         </p>
       </div>
       <p class="post-text">
-        <span class="user-name">${post.user.name}</span>
-        ${post.description}
+        <span class="user-name">${escapeHtml(post.user.name)}</span>
+        ${escapeHtml(post.description)}
       </p>
       <p class="post-date">
         ${formatDate(post.createdAt)}
@@ -54,7 +65,9 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
       ${
         user && user.id === post.user.id
           ? `
-        <button class="delete-button" data-post-id="${post.id}">Удалить</button>
+        <button class="delete-button" data-post-id="${escapeHtml(
+          post.id
+        )}">Удалить</button>
       `
           : ""
       }

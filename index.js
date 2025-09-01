@@ -156,10 +156,15 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       onAddPostClick({ description, imageUrl }) {
+        console.log("Данные для отправки:", {
+          description,
+          imageUrl,
+          token: getToken(),
+        });
         addPost({ description, imageUrl, token: getToken() })
           .then((response) => {
-            // Добавляем новый пост в начало списка
-            posts.unshift(response.post);
+            console.log("Успешный ответ API:", response);
+            // После успешного добавления поста перезагружаем список постов
             goToPage(POSTS_PAGE);
           })
           .catch((error) => {

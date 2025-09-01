@@ -24,10 +24,22 @@ export function getPosts({ token }) {
 }
 
 export function getUserPosts({ userId, token }) {
-  // Получаем все посты и фильтруем по userId на клиенте
-  return getPosts({ token }).then((allPosts) => {
-    return allPosts.filter((post) => post.user.id === userId);
-  });
+  return fetch(`${postsHost}/user-posts/${userId}`, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      return data.posts;
+    });
 }
 
 export function registerUser({ login, password, name, imageUrl }) {
@@ -108,22 +120,40 @@ export function uploadImage({ file }) {
 
 // Добавить новый пост
 export function addPost({ description, imageUrl, token }) {
+  const requestBody = {
+    description,
+    imageUrl,
+  };
+
+  console.log("API запрос:", {
+    url: postsHost,
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+    body: requestBody,
+  });
+
   return fetch(postsHost, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: token,
     },
-    body: JSON.stringify({
-      description,
-      imageUrl,
-    }),
+    body: JSON.stringify(requestBody),
   }).then((response) => {
+    console.log("Ответ API:", response.status, response.statusText);
+
     if (response.status === 401) {
       throw new Error("Нет авторизации");
     }
     if (response.status === 400) {
-      throw new Error("Неверные данные поста");
+      return response.json().then((errorData) => {
+        console.log("Детали ошибки 400:", errorData);
+        throw new Error("Неверные данные поста");
+      });
+    }
+    if (response.status === 201) {
+      return response.json();
     }
     if (!response.ok) {
       throw new Error("Ошибка при добавлении поста");
