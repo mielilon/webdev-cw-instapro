@@ -1,0 +1,33 @@
+{
+    "name": "course-work-instapro",
+    "version": "1.0.0",
+    "description": "MVP социальной сети для обмена фотографиями",
+    "main": "index.js",
+    "scripts": {
+        "dev": "webpack --mode development --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/OlmerOnline/course-work-instapro.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/OlmerOnline/course-work-instapro/issues"
+    },
+    "homepage": "https://github.com/OlmerOnline/course-work-instapro#readme",
+    "devDependencies": {
+        "@eslint/js": "^9.28.0",
+        "eslint": "^9.28.0",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.4.1",
+        "globals": "^16.2.0",
+        "prettier": "^3.5.3",
+        "webpack": "^5.99.9",
+        "webpack-cli": "^6.0.1"
+    },
+    "dependencies": {
+        "date-fns": "^4.1.0"
+    }
+}
