@@ -196,3 +196,203 @@
   width: 100%;
   text-align: center;
 }
+
+.delete-button {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.delete-button:hover {
+  background-color: #cc0000;
+}
+
+/* Анимации и переходы */
+.post {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.like-button {
+  transition: transform 0.1s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button:active {
+  transform: scale(0.95);
+}
+
+.button {
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.post-header {
+  transition: background-color 0.2s ease;
+}
+
+.post-header:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 0 10px;
+  }
+
+  .page-header {
+    padding: 15px 10px;
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .logo {
+    font-size: 24px;
+    width: 100px;
+  }
+
+  .post {
+    margin-bottom: 20px;
+  }
+
+  .post-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .post-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .form {
+    padding: 20px 15px;
+  }
+
+  .input,
+  .button {
+    font-size: 16px; /* Предотвращает зум на iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0 5px;
+  }
+
+  .page-header {
+    padding: 10px 5px;
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .logo {
+    font-size: 20px;
+    width: 80px;
+  }
+
+  .header-button {
+    font-size: 12px;
+  }
+
+  .post-header__user-name {
+    font-size: 14px;
+  }
+
+  .post-likes-text {
+    font-size: 12px;
+  }
+}
+
+/* Улучшения доступности */
+.like-button:focus,
+.delete-button:focus,
+.button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.post-header:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Анимация загрузки */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Улучшения для форм */
+.form-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+  min-height: 20px;
+}
+
+.input:invalid {
+  border-color: #dc3545;
+}
+
+.input:valid {
+  border-color: #28a745;
+}
+
+/* Скрытие элементов для скрин-ридеров */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
