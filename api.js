@@ -4,6 +4,24 @@ const personalKey = "prod";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
+export async function addNewPost({ token, description, imageUrl }) {
+  return fetch(postsHost, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
+  }).then((response) => {
+    if (response.status === 400) {
+      throw new Error("Не удалось добавить пост");
+    }
+    return response.json();
+  });
+}
+
 export function getPosts({ token }) {
   return fetch(postsHost, {
     method: "GET",
@@ -23,7 +41,7 @@ export function getPosts({ token }) {
     });
 }
 
-export function registerUser({ login, password, name, imageUrl }) {
+export async function registerUser({ login, password, name, imageUrl }) {
   return fetch(baseHost + "/api/user", {
     method: "POST",
     body: JSON.stringify({
@@ -66,4 +84,51 @@ export function uploadImage({ file }) {
   }).then((response) => {
     return response.json();
   });
+}
+
+export async function getUserPosts({ token, id }) {
+  const response = await fetch(postsHost + "/user-posts/" + id, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Ошибка запроса");
+  }
+  return await response.json();
+} //Сетевой запрос постов пользователя
+
+export async function setLike({ token, id }) {
+  try {
+    const response = await fetch(postsHost + `/${id}/like`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("сетевая ошибка");
+    }
+    return await response.json();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function unsetLike({ token, id }) {
+  try {
+    const response = await fetch(postsHost + `/${id}/dislike`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("сетевая ошибка");
+    }
+    return await response.json();
+  } catch (error) {
+    console.log(error);
+  }
 }

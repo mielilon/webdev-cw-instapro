@@ -9,7 +9,7 @@ import { renderHeaderComponent } from "./header-component.js";
  * @param {Object} params.user - Объект пользователя, содержащий данные о текущем авторизованном пользователе (если он есть).
  * @param {Function} params.goToPage - Функция для навигации по страницам.
  */
-export function renderLoadingPageComponent({ appEl, user, goToPage }) {
+export function renderLoadingPageComponent({ appEl }) {
   /**
    * HTML-разметка страницы загрузки.
    * Содержит контейнер заголовка и индикатор загрузки.
@@ -30,8 +30,6 @@ export function renderLoadingPageComponent({ appEl, user, goToPage }) {
    * Передаются данные пользователя и функция навигации.
    */
   renderHeaderComponent({
-    user,
-    element: document.querySelector(".header-container"),
-    goToPage,
+    element: document.querySelector(".header-container")
   });
 }
