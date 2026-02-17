@@ -1,5 +1,5 @@
-import { uploadImage } from "../api.js";
-
+import { uploadImage, baseHost } from "../api.js";
+import { getToken } from '../index.js';
 /**
  * Компонент загрузки изображения.
  * Этот компонент позволяет пользователю загружать изображение и отображать его превью.
@@ -42,6 +42,7 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
               />
               Выберите фото
             </label>
+            <p class="file-upload-hint">Допустимые форматы: JPEG, PNG</p>
           `
         }
       </div>
@@ -49,19 +50,50 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
 
     // Обработчик выбора файла
     const fileInputElement = element.querySelector(".file-upload-input");
-    fileInputElement?.addEventListener("change", () => {
-      const file = fileInputElement.files[0];
-      if (file) {
-        const labelEl = document.querySelector(".file-upload-label");
-        labelEl.setAttribute("disabled", true);
-        labelEl.textContent = "Загружаю файл...";
-        
+    fileInputElement?.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const labelEl = element.querySelector(".file-upload-label");
+      labelEl.setAttribute("disabled", true);
+      labelEl.textContent = "Загружаю файл...";
+
+      try {
+        const token = getToken();
+        if (!token) {
+          throw new Error('Необходимо авторизоваться');
+        }
+
+        // Проверяем формат файла
+        const acceptedTypes = ['image/jpeg', 'image/png'];
+        if (!acceptedTypes.includes(file.type)) {
+          throw new Error('Неверный формат файла');
+        }
         // Загружаем изображение с помощью API
-        uploadImage({ file }).then(({ fileUrl }) => {
-          imageUrl = fileUrl; // Сохраняем URL загруженного изображения
-          onImageUrlChange(imageUrl); // Уведомляем о изменении URL изображения
-          render(); // Перерисовываем компонент с новым состоянием
-        });
+        const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${baseHost}/api/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка при загрузке файла');
+    }
+
+    const data = await response.json();
+    imageUrl = data.fileUrl;
+        onImageUrlChange(imageUrl);
+        render();
+      } catch (error) {
+        alert(`Ошибка загрузки: ${error.message}`);
+        labelEl.removeAttribute("disabled");
+        labelEl.textContent = "Выбрать фото";
+        fileInputElement.value = '';
       }
     });
 
@@ -69,12 +101,10 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
     element
       .querySelector(".file-upload-remove-button")
       ?.addEventListener("click", () => {
-        imageUrl = ""; // Сбрасываем URL изображения
-        onImageUrlChange(imageUrl); // Уведомляем об изменении URL изображения
-        render(); // Перерисовываем компонент
+        imageUrl = "";
+        onImageUrlChange(imageUrl);
+        render();
       });
   };
-
-  // Инициализация компонента
   render();
 }
