@@ -196,3 +196,42 @@
   width: 100%;
   text-align: center;
 }
+.error-container {
+  text-align: center;
+  padding: 40px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.like-button {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button.liked img {
+  filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5));
+}
+
+.like-placeholder {
+  width: 32px;
+  height: 32px;
+}
+
+.textarea {
+  font-family: StratosSkyeng;
+  resize: vertical;
+}
+
+.posts-user-header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}

@@ -1,0 +1,180 @@
+import { renderHeaderComponent } from "./header-component.js";
+import { goToPage, user } from "../index.js";
+import { getUserPosts, likePost, dislikePost } from "../api.js";
+import { formatDistanceToNow } from "./date-utils.js";
+
+const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666666' font-size='20'%3E👤%3C/text%3E%3C/svg%3E";
+const DEFAULT_COVER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 70 70'%3E%3Crect width='70' height='70' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666666' font-size='35'%3E👤%3C/text%3E%3C/svg%3E";
+
+export function renderUserPostsPageComponent({ appEl, userId }) {
+  const token = user ? `Bearer ${user.token}` : undefined;
+  let posts = [];
+
+  const render = async () => {
+    appEl.innerHTML = `
+      <div class="page-container">
+        <div class="header-container"></div>
+        <div class="loading-page">
+          <div class="loader"><div></div><div></div><div></div></div>
+        </div>
+      </div>
+    `;
+
+    renderHeaderComponent({
+      element: document.querySelector(".header-container"),
+    });
+
+    try {
+      posts = await getUserPosts({ token, userId });
+      renderPosts();
+    } catch (error) {
+      console.error("Ошибка загрузки постов пользователя:", error);
+      appEl.innerHTML = `
+        <div class="page-container">
+          <div class="header-container"></div>
+          <div class="error-container">
+            <p>❌ Ошибка загрузки постов</p>
+            <button class="button" id="retry-button">Попробовать снова</button>
+          </div>
+        </div>
+      `;
+      
+      renderHeaderComponent({
+        element: document.querySelector(".header-container"),
+      });
+      
+      document.getElementById("retry-button")?.addEventListener("click", () => {
+        renderUserPostsPageComponent({ appEl, userId });
+      });
+    }
+  };
+
+  const renderPosts = () => {
+    if (!posts || posts.length === 0) {
+      appEl.innerHTML = `
+        <div class="page-container">
+          <div class="header-container"></div>
+          <div class="empty-state">
+            <p>📭 У пользователя пока нет постов</p>
+          </div>
+        </div>
+      `;
+      renderHeaderComponent({
+        element: document.querySelector(".header-container"),
+      });
+      return;
+    }
+
+    const userInfo = posts[0]?.user;
+    const userAvatar = userInfo?.imageUrl || DEFAULT_COVER;
+    const postsHtml = posts.map(post => createPostHTML(post, token)).join('');
+
+    const appHtml = `
+      <div class="page-container">
+        <div class="header-container"></div>
+        <div class="posts-user-header">
+          <img src="${userAvatar}" 
+               class="posts-user-header__user-image"
+               alt="${escapeHtml(userInfo?.name || 'Пользователь')}">
+          <p class="posts-user-header__user-name">${escapeHtml(userInfo?.name || 'Пользователь')}</p>
+        </div>
+        <ul class="posts">
+          ${postsHtml}
+        </ul>
+      </div>
+    `;
+
+    appEl.innerHTML = appHtml;
+
+    renderHeaderComponent({
+      element: document.querySelector(".header-container"),
+    });
+
+    document.querySelectorAll('.like-button').forEach(button => {
+      button.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const postId = button.dataset.postId;
+        const isLiked = button.classList.contains('liked');
+        
+        if (!token) {
+          alert("Войдите в систему, чтобы ставить лайки");
+          return;
+        }
+        
+        try {
+          if (isLiked) {
+            await dislikePost({ token, postId });
+          } else {
+            await likePost({ token, postId });
+          }
+          
+          posts = await getUserPosts({ token, userId });
+          renderPosts();
+        } catch (error) {
+          console.error("Ошибка при изменении лайка:", error);
+          alert("Не удалось поставить лайк. Попробуйте позже.");
+        }
+      });
+    });
+  };
+
+  render();
+}
+
+function createPostHTML(post, token) {
+  const date = post.createdAt ? new Date(post.createdAt) : new Date();
+  const timeAgo = formatDistanceToNow(date);
+  
+  const isLiked = post.isLiked || false;
+  // ИСПРАВЛЕНО: если likes - массив, берем его длину, иначе само значение
+  const likeCount = Array.isArray(post.likes) ? post.likes.length : (post.likes || 0);
+  const userAvatar = post.user?.imageUrl || DEFAULT_AVATAR;
+  
+  const likeButtonHtml = token ? `
+    <button data-post-id="${post.id}" class="like-button ${isLiked ? 'liked' : ''}" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px 8px 5px 0;">
+      ${isLiked ? '❤️' : '🤍'}
+      <span style="font-size: 14px; margin-left: 5px;">${likeCount}</span>
+    </button>
+  ` : `
+    <div style="font-size: 24px; padding: 8px 8px 5px 0;">
+      🤍 <span style="font-size: 14px;">${likeCount}</span>
+    </div>
+  `;
+
+  return `
+    <li class="post">
+      <div class="post-header">
+        <img src="${userAvatar}" 
+             class="post-header__user-image"
+             alt="${escapeHtml(post.user?.name || 'Пользователь')}">
+        <p class="post-header__user-name">${escapeHtml(post.user?.name || 'Аноним')}</p>
+      </div>
+      
+      ${post.imageUrl ? `
+        <div class="post-image-container">
+          <img class="post-image" src="${post.imageUrl}" alt="Пост" onerror="this.style.display='none'">
+        </div>
+      ` : ''}
+      
+      <div class="post-likes">
+        ${likeButtonHtml}
+      </div>
+      
+      <p class="post-text">
+        <span class="user-name">${escapeHtml(post.user?.name || 'Аноним')}</span>
+        ${escapeHtml(post.description || '')}
+      </p>
+      
+      <p class="post-date">
+        ${timeAgo}
+      </p>
+    </li>
+  `;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
