@@ -1,5 +1,5 @@
 import { goToPage, logout, user } from "../index.js";
-import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from "../routes.js";
+import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE, USER_POSTS_PAGE } from "../routes.js";
 
 /**
  * Компонент заголовка страницы.
@@ -24,7 +24,10 @@ export function renderHeaderComponent({ element }) {
       </button>
       ${
         user
-          ? `<button title="${user.name}" class="header-button logout-button">Выйти</button>`
+          ? `<div class="header-box_logout-btn">
+              <p class="header-user">Аккаунт - ${user.name}</p>
+              <button title="${user.name}" class="header-button logout-button">Выйти</button>
+            </div>`
           : ""
       }  
   </div>
@@ -35,9 +38,7 @@ export function renderHeaderComponent({ element }) {
    * Если пользователь авторизован, перенаправляет на страницу добавления постов.
    * Если пользователь не авторизован, перенаправляет на страницу авторизации.
    */
-  element
-    .querySelector(".add-or-login-button")
-    .addEventListener("click", () => {
+  element.querySelector(".add-or-login-button").addEventListener("click", () => {
       if (user) {
         goToPage(ADD_POSTS_PAGE);
       } else {
@@ -58,6 +59,10 @@ export function renderHeaderComponent({ element }) {
    * Если кнопка существует (т.е. пользователь авторизован), вызывает функцию `logout`.
    */
   element.querySelector(".logout-button")?.addEventListener("click", logout);
+
+  element.querySelector(".header-user")?.addEventListener("click", () => {
+    goToPage(USER_POSTS_PAGE, { userId: user._id});
+  });
 
   return element;
 }

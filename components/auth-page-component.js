@@ -1,4 +1,5 @@
 import { loginUser, registerUser } from "../api.js";
+import { replaceMethod } from "../security.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { renderUploadImageComponent } from "./upload-image-component.js";
 
@@ -102,8 +103,8 @@ export function renderAuthPageComponent({ appEl, setUser }) {
 
       if (isLoginMode) {
         // Обработка входа
-        const login = document.getElementById("login-input").value;
-        const password = document.getElementById("password-input").value;
+        const login = replaceMethod(document.getElementById("login-input"))
+        const password = replaceMethod(document.getElementById("password-input"))
 
         if (!login) {
           alert("Введите логин");
@@ -125,9 +126,9 @@ export function renderAuthPageComponent({ appEl, setUser }) {
           });
       } else {
         // Обработка регистрации
-        const login = document.getElementById("login-input").value;
-        const name = document.getElementById("name-input").value;
-        const password = document.getElementById("password-input").value;
+        const login = replaceMethod(document.getElementById("login-input"))
+        const name = replaceMethod(document.getElementById("name-input"))
+        const password = replaceMethod(document.getElementById("password-input"))
 
         if (!name) {
           alert("Введите имя");
