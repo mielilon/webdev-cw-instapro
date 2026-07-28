@@ -4,7 +4,7 @@ import { posts, goToPage } from "../index.js";
 
 export function renderPostsPageComponent({ appEl }) {
   // @TODO: реализовать рендер постов из api
-  console.log("Актуальный список постов:", posts);
+  // console.log("Актуальный список постов:", posts);
   const postsHtml = posts
     .map((post) => {
       const likesCount = post.likes ? post.likes.length : 0;
