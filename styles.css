@@ -1,5 +1,175 @@
+/*
+  Убираем внешние и внутренние отступы
+ */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/*
+  Нормализация блочной модели
+ */
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/*
+  Убираем внутренние отступы слева тегам списков,
+  у которых есть атрибут class
+ */
+:where(ul, ol):where([class]) {
+  padding-left: 0;
+}
+
+/*
+  Убираем внешние отступы body и двум другим тегам,
+  у которых есть атрибут class
+ */
+body,
+:where(blockquote, figure):where([class]) {
+  margin: 0;
+}
+
+/*
+  Убираем внешние отступы вертикали нужным тегам,
+  у которых есть атрибут class
+ */
+:where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl):where([class]) {
+  margin-block: 0;
+}
+
+:where(dd[class]) {
+  margin-left: 0;
+}
+
+:where(fieldset[class]) {
+  margin-left: 0;
+  padding: 0;
+  border: none;
+}
+
+/*
+  Убираем стандартный маркер маркированному списку,
+  у которого есть атрибут class
+ */
+:where(ul[class]) {
+  list-style: none;
+}
+
+/*
+  Убираем стандартную стилизацию ссылок
+ */
+a {
+  text-decoration: none;
+}
+
+/*
+  Обнуляем вертикальные внешние отступы параграфа,
+  объявляем локальную переменную для внешнего отступа вниз,
+  чтобы избежать взаимодействие с более сложным селектором
+ */
+p {
+  --paragraphMarginBottom: 24px;
+  margin-block: 0;
+}
+
+/*
+  Внешний отступ вниз для параграфа без атрибута class,
+  который расположен не последним среди своих соседних элементов
+ */
+p:where(:not([class]):not(:last-child)) {
+  margin-bottom: var(--paragraphMarginBottom);
+}
+
+/*
+  Упрощаем работу с изображениями
+ */
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/*
+  Наследуем свойства шрифт для полей ввода
+ */
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+html {
+  /*
+   Пригодится в большинстве ситуаций
+   (когда, например, нужно будет "прижать" футер к низу сайта)
+  */
+  height: 100%;
+}
+
+/*
+  Плавный скролл
+ */
+html,
+:has(:target) {
+  scroll-behavior: smooth;
+}
+
+body {
+  /*
+   Пригодится в большинстве ситуаций
+   (когда, например, нужно будет "прижать" футер к низу сайта)
+  */
+  min-height: 100%;
+  /*
+   Унифицированный интерлиньяж
+  */
+  line-height: 1.5;
+  background: linear-gradient(to bottom, #fae9ef 0%);
+}
+
+/*
+  Приводим к единому цвету svg-элементы
+ */
+svg *[fill] {
+  fill: currentColor;
+}
+
+svg *[stroke] {
+  stroke: currentColor;
+}
+
+/*
+  Чиним баг задержки смены цвета при взаимодействии с svg-элементами
+ */
+svg * {
+  -webkit-transition-property: fill, stroke;
+  transition-property: fill, stroke;
+}
+
+/* Делаем перенос текста */
+p,
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+}
+
 .page-container {
-  padding: 0 20px;
+  padding-inline: max(16px, calc(50% - 600px));
+  margin-inline: auto;
+}
+
+.page-wrapper {
+  background: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  box-shadow: 0 8px 15px rgba(214, 150, 172, 0.4);
 }
 
 .page-header {
@@ -7,9 +177,9 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e0e0e0;
-  padding: 20px 16px;
-  margin-left: -20px;
-  margin-right: -20px;
+  padding: 30px 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .logo {
@@ -17,24 +187,32 @@
   font-size: 28px;
   cursor: pointer;
   width: 130px;
+  color: #e46e9d;
 }
 
 .header-container {
   margin-bottom: 8px;
 }
 
-.header-button {
+.logout-button,
+.login-text {
   padding: 0;
   border: none;
   background-color: transparent;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 18px;
-  font-weight: 500;
+  font-weight: 400;
+  width: 130px;
+  color: black;
   cursor: pointer;
 }
 
+.logout-button:hover,
+.login-text:hover {
+  color: #e46e9d;
+}
+
 .logout-button {
-  width: 130px;
   text-align: right;
 }
 
@@ -42,8 +220,27 @@
   display: flex;
   flex-direction: column;
   list-style: none;
-  padding: 0;
+  align-items: center;
+  justify-content: center;
   margin: 0;
+}
+
+.post {
+  margin-bottom: 20px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+  padding: 20px;
+  background: white;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 8px 20px rgba(214, 150, 172, 0.4);
+  transition: box-shadow ease 0.3s;
+}
+
+.user-post:hover {
+  box-shadow: 0px 0px 20px rgb(219 42 104 / 40%);
 }
 
 .post-header {
@@ -52,6 +249,20 @@
   align-items: center;
   margin-bottom: 10px;
   cursor: pointer;
+}
+
+.post-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.post-description.is-open {
+  -webkit-line-clamp: unset;
 }
 
 .post-header__user-image {
@@ -63,25 +274,44 @@
 }
 
 .post-image-container {
-  margin-left: -20px;
-  margin-right: -20px;
-  height: 500px;
   display: flex;
   justify-content: center;
-  background-color: #e0e0e0;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.post-image-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: blur(10px);
+  transform: scale(1.1);
+  z-index: 1;
 }
 
 .post-image {
-  width: 100%;
-  height: 100%;
-  max-width: 500px;
-  object-fit: cover;
+  width: auto;
+  max-height: 700px;
+  object-position: center;
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  height: auto;
 }
 
 .post-likes {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-top: 5px;
 }
 
 .like-button {
@@ -93,18 +323,27 @@
   cursor: pointer;
 }
 
+.post-user__user-name,
 .user-name {
   font-weight: 500;
 }
 
+.user-name {
+  margin-right: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .post-text {
   font-size: 14px;
+  display: flex;
   line-height: 18px;
   margin-top: 5px;
 }
 
-.post-date {
+.post-user__post-date {
   color: #8a8a8a;
+  font-size: 12px;
 }
 
 .post + .post {
@@ -116,11 +355,17 @@
   flex-direction: row;
   align-items: center;
   margin-bottom: 12px;
+  background-color: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  padding: 10px;
 }
 
 .posts-user-header__user-image {
-  width: 70px;
-  height: 70px;
+  width: 55px;
+  height: 55px;
   object-fit: cover;
   border-radius: 40px;
   margin-right: 10px;
@@ -129,6 +374,25 @@
 .posts-user-header__user-name {
   font-size: 28px;
   line-height: 35px;
+  font-weight: 400;
+  background: linear-gradient(135deg, #000000, #e46e9d, #000000);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientMove 4s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .loading-page {
@@ -141,6 +405,72 @@
   background-image: url("data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 122.88 122.88'%3E%3Ctitle%3Eadd%3C/title%3E%3Cpath d='M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z'/%3E%3C/svg%3E");
   height: 30px;
   width: 30px;
+  background-color: white;
+}
+
+.add-or-login-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.file-upload-image-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.login-button {
+  cursor: pointer;
+}
+
+.register-input {
+  caret-color: #e46e9d;
+  background-color: white;
+}
+
+.register-button {
+  display: block;
+  padding: 10px 13px 13px;
+  font-size: 18px;
+  line-height: 22px;
+  border-radius: 5px;
+  background-color: #ff6b9d;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 8px 20px rgba(214, 150, 172, 0.4);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.register-button:hover {
+  box-shadow:
+    0 8px 20px rgba(214, 150, 172, 0.4),
+    0 0 40px rgba(255, 107, 157, 0.3);
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 8px 20px rgba(214, 150, 172, 0.4),
+      0 0 40px rgba(255, 107, 157, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 8px 20px rgba(214, 150, 172, 0.4),
+      0 0 60px rgba(255, 107, 157, 0.5);
+  }
+}
+
+.register-button:active {
+  transform: scale(0.95);
+  animation: none;
+}
+
+.register-input:focus-visible {
+  outline: none;
 }
 
 .form {
@@ -153,6 +483,8 @@
   font-size: 28px;
   line-height: 35px;
   text-align: center;
+  margin-bottom: 10px;
+  color: #2c2c38;
 }
 
 .form-inputs {
@@ -182,12 +514,14 @@
 }
 
 .file-upload-image {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   object-fit: cover;
-  margin-right: 10px;
-  border: 1px solid gray;
-  border-radius: 5px;
+  border: 1px solid #ff6b9d;
+  box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+  margin-right: 25px;
+  transition: all ease 0.5s;
 }
 
 .file-upload-label {
@@ -195,4 +529,285 @@
   box-sizing: border-box;
   width: 100%;
   text-align: center;
+}
+
+.add-photo-button {
+  background: #ff6b9d;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.add-photo-button:hover {
+  background-color: white;
+  color: #ef569d;
+  box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+}
+
+/* Волшебные цветы */
+.add-photo-button::before {
+  content: "🌸";
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+.add-photo-button::after {
+  content: "🌸";
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: all 0.6s ease;
+}
+
+.add-photo-button:hover::before {
+  left: 10px;
+  opacity: 1;
+  animation: float 1s ease infinite;
+}
+
+.add-photo-button:hover::after {
+  right: 10px;
+  opacity: 1;
+  animation: float 1s ease infinite 0.3s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-70%) rotate(15deg);
+  }
+}
+
+.page-label {
+  font-size: 16px;
+  color: #2c2c38;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ff6b9d;
+  color: white;
+  padding: 14px 35px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  border: none;
+  transition: all 0.5s ease;
+}
+
+.file-upload-label::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: left 0.6s ease;
+}
+
+.file-upload-label:hover::before {
+  left: 100%;
+}
+
+.file-upload-label:hover {
+  box-shadow: 0 8px 30px rgba(255, 107, 157, 0.4);
+}
+
+.file-upload-label:active {
+  transform: scale(0.95);
+}
+
+.file-upload-label .icon {
+  font-size: 20px;
+  transition: transform 0.5s ease;
+}
+
+.file-upload-label:hover .icon {
+  transform: rotate(-10deg) scale(1.15);
+}
+
+.file-upload-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.label-text {
+  vertical-align: middle;
+}
+
+.user-posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(385px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.posts > .user-post {
+  margin: 0;
+  cursor: pointer;
+  max-height: 555px;
+}
+
+.user-post-date {
+  margin-left: auto;
+  font-size: 12px;
+  color: #36363d;
+}
+
+.user-post-image-container > .user-post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-height: 700px;
+  object-position: center;
+}
+
+.post > .user-post-image-container {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.user-post:last-of-type {
+  margin-bottom: 40px;
+}
+
+@media (max-width: 1226px) {
+  .user-post-image-container > .user-post-image {
+    max-height: 430px;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+  }
+
+  .user-post-image-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px);
+    transform: scale(1.1);
+    z-index: 1;
+  }
+
+  .post > .user-post-image-container {
+    aspect-ratio: unset;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  .posts > .user-post {
+    margin: 0;
+    min-height: 480px;
+    max-height: unset;
+  }
+
+  .user-post:last-of-type {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .post {
+    max-width: 700px;
+  }
+
+  .post-image {
+    max-height: 497px;
+  }
+}
+
+@media (max-width: 821px) {
+  .user-posts {
+    place-items: center;
+    margin-inline: 10px;
+  }
+
+  .posts > .user-post {
+    min-height: unset;
+    max-height: 560px;
+    max-width: 580px;
+  }
+
+  .user-post:last-of-type {
+    margin-bottom: 80px;
+  }
+}
+
+@media (max-width: 500px) {
+  .user-post-image-container > .user-post-image {
+    max-height: 345px;
+    width: auto;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .post > .user-post-image-container {
+    max-height: 400px;
+  }
+
+  .posts > .user-post {
+    min-height: unset;
+  }
+
+  .add-post-sign {
+    margin-left: 35px;
+  }
+}
+
+@media (max-width: 429px) {
+  .posts > .user-post {
+    min-height: 400px;
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 400px) {
+  .post-image {
+    max-height: 350px;
+  }
 }

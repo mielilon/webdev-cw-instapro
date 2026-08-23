@@ -9,17 +9,19 @@ import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from "../routes.js";
  * @returns {HTMLElement} Возвращает элемент заголовка после рендеринга.
  */
 export function renderHeaderComponent({ element }) {
+
   /**
    * Рендерит содержимое заголовка.
    */
   element.innerHTML = `
+  <div class= "page-wrapper">
   <div class="page-header">
       <h1 class="logo">instapro</h1>
       <button class="header-button add-or-login-button">
       ${
         user
           ? `<div title="Добавить пост" class="add-post-sign"></div>`
-          : "Войти"
+          :  `<span class="login-text">Войти</span>`
       }
       </button>
       ${
@@ -27,6 +29,7 @@ export function renderHeaderComponent({ element }) {
           ? `<button title="${user.name}" class="header-button logout-button">Выйти</button>`
           : ""
       }  
+  </div>
   </div>
   `;
 

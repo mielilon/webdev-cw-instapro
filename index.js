@@ -15,12 +15,16 @@ import {
   removeUserFromLocalStorage,
   saveUserToLocalStorage,
 } from "./helpers.js";
+import { renderHeaderComponent } from "./components/header-component.js";
+import { renderAccountPage } from "./components/render-account-page.js";
+import { uploadImage, createPost, initLikeHandlers } from "./api.js";
 
 export let user = getUserFromLocalStorage();
 export let page = null;
 export let posts = [];
+export let userPosts = [];
 
-const getToken = () => {
+export const getToken = () => {
   const token = user ? `Bearer ${user.token}` : undefined;
   return token;
 };
@@ -68,9 +72,12 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
+
+      // СДЕЛАНО
+      let userId = data.userId;
       page = USER_POSTS_PAGE;
-      posts = [];
+      userPosts = posts.filter((post) => post.user.id === userId);
+
       return renderApp();
     }
 
@@ -109,10 +116,30 @@ const renderApp = () => {
   if (page === ADD_POSTS_PAGE) {
     return renderAddPostPageComponent({
       appEl,
-      onAddPostClick({ description, imageUrl }) {
+      async onAddPostClick({ description, imageUrl }) {
         // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
+
+        //СДЕЛАНО
+        if (description.trim() === "") {
+              alert("В описании пусто :(, напишите что-нибудь");
+              return
+          }
+
+        try {
+          await createPost({ description, imageUrl });
+
+          console.log("Добавляю пост...", { description, imageUrl });
+          goToPage(POSTS_PAGE);
+        } catch (error) {
+          console.log(error.message);
+          if (error.message === "В теле не передан description") {
+            alert("Добавьте описание");
+          }
+
+          if (error.message === "В теле не передан imageUrl") {
+            alert("Вы забыли добавить картинку");
+          }
+        }
       },
     });
   }
@@ -124,8 +151,21 @@ const renderApp = () => {
   }
 
   if (page === USER_POSTS_PAGE) {
-    // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
+    // СДЕЛАНО
+
+    appEl.innerHTML = `
+    <div class = "page-container">
+    <div class = "header-container"></div>
+    <div class = "posts-user-header"></div>
+    <ul class ="posts user-posts"></ul>
+    </div>`;
+
+    let headerContainer = document.querySelector(".header-container");
+
+    renderHeaderComponent({ element: headerContainer });
+    renderAccountPage();
+ initLikeHandlers({ token: getToken() })
+ 
     return;
   }
 };

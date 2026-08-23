@@ -25,8 +25,6 @@ html {
 }
 
 body {
-  margin: 0;
-  padding: 0;
   font-family: StratosSkyeng;
   overflow: auto;
   font-size: 14px;
@@ -38,9 +36,17 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-p {
-  margin: 0;
+/* убирает автозаполнение браузера */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #333 !important;
+  background-color: transparent !important;
+  background-clip: content-box !important;
 }
+
 
 .button,
 .secondary-button {
@@ -49,9 +55,10 @@ p {
   font-size: 18px;
   line-height: 22px;
   border-radius: 5px;
-  background-color: #565eef;
+  background-color: #ff6b9d;
   color: #ffffff;
   border: none;
+  box-shadow: 0 8px 20px rgba(214, 150, 172, 0.4);
 }
 
 .link-button {
@@ -59,13 +66,32 @@ p {
   border: 0;
   padding: 0;
   background: none;
-  color: #565eef;
+  transition: color 0.3s ease;
+  position: relative;
+  color: #ff6b9d;
   cursor: pointer;
 }
 
-.button:hover {
-  background-color: #6d73ff;
+/* Линия снизу */
+.link-button::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #ff6b9d;
+  transition: width 0.3s ease;
 }
+
+.link-button:hover {
+  color: #ff6b9d;
+}
+
+.link-button:hover::after {
+  width: 100%;
+}
+
 
 .button[disabled="true"],
 .secondary-button[disabled="true"] {
@@ -74,21 +100,10 @@ p {
   pointer-events: none;
 }
 
-.button:active {
-  background-color: #4f56ce;
-}
-
 .secondary-button {
-  background-color: #edecff;
-  color: #565eef;
-}
-
-.secondary-button:hover {
-  background-color: #f2eeff;
-}
-
-.secondary-button:active {
-  background-color: #d8d7ff;
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .input {
@@ -100,7 +115,6 @@ p {
   color: rgb(4, 18, 27);
   border: none;
   border-radius: 5px;
-  background-color: #e8e8e8;
 }
 
 .input .-error {
@@ -115,14 +129,21 @@ p {
   padding: 15px;
   resize: none;
   width: 100%;
+  background-color: white;
   height: 100px;
+  margin-top: 10px;
+  color: #2c2c38;
+  caret-color: #e46e9d;
+}
+
+.textarea:focus-visible {
+  outline: none;
 }
 
 strong {
   font-weight: 500;
 }
 
-/** Анимация загрузки **/
 .loader {
   display: inline-block;
   position: relative;
