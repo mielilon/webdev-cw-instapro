@@ -1,20 +1,23 @@
 import { goToPage, logout, user } from "../index.js";
 import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from "../routes.js";
 
-/**
- * Компонент заголовка страницы.
- * Этот компонент отображает шапку страницы с логотипом, кнопкой добавления постов/входа и кнопкой выхода (если пользователь авторизован).
- * 
- * @param {HTMLElement} params.element - HTML-элемент, в который будет рендериться заголовок.
- * @returns {HTMLElement} Возвращает элемент заголовка после рендеринга.
- */
 export function renderHeaderComponent({ element }) {
-  /**
-   * Рендерит содержимое заголовка.
-   */
+  // Применяем сохранённую тему при каждом рендере шапки
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-theme");
+  } else {
+    document.body.classList.remove("dark-theme");
+  }
+
+  const isDark = document.body.classList.contains("dark-theme");
+
   element.innerHTML = `
   <div class="page-header">
       <h1 class="logo">instapro</h1>
+      <button class="header-button theme-toggle-button" title="Сменить тему">
+        ${isDark ? "☀️ Светлая" : "🌙 Тёмная"}
+      </button>
       <button class="header-button add-or-login-button">
       ${
         user
@@ -30,11 +33,18 @@ export function renderHeaderComponent({ element }) {
   </div>
   `;
 
-  /**
-   * Обработчик клика по кнопке "Добавить пост"/"Войти".
-   * Если пользователь авторизован, перенаправляет на страницу добавления постов.
-   * Если пользователь не авторизован, перенаправляет на страницу авторизации.
-   */
+  // Переключатель темы
+  element
+    .querySelector(".theme-toggle-button")
+    .addEventListener("click", () => {
+      document.body.classList.toggle("dark-theme");
+      // Сохраняем выбор, чтобы он не сбрасывался после перезагрузки
+      const nowDark = document.body.classList.contains("dark-theme");
+      localStorage.setItem("theme", nowDark ? "dark" : "light");
+      // Перерисовываем шапку, чтобы надпись на кнопке обновилась
+      renderHeaderComponent({ element });
+    });
+
   element
     .querySelector(".add-or-login-button")
     .addEventListener("click", () => {
@@ -45,18 +55,10 @@ export function renderHeaderComponent({ element }) {
       }
     });
 
-  /**
-   * Обработчик клика по логотипу.
-   * Перенаправляет на страницу с постами.
-   */
   element.querySelector(".logo").addEventListener("click", () => {
     goToPage(POSTS_PAGE);
   });
 
-  /**
-   * Обработчик клика по кнопке "Выйти".
-   * Если кнопка существует (т.е. пользователь авторизован), вызывает функцию `logout`.
-   */
   element.querySelector(".logout-button")?.addEventListener("click", logout);
 
   return element;
