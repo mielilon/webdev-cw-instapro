@@ -123,6 +123,7 @@ const handleLikeClick = ({ postId }) => {
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
+  
   if (page === LOADING_PAGE) {
     return renderLoadingPageComponent({
       appEl,
