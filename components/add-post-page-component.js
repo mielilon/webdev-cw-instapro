@@ -1,9 +1,8 @@
 import { renderHeaderComponent } from "./header-component.js";
 import { renderUploadImageComponent } from "./upload-image-component.js";
 
-let imageUrl = "";
-
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
+  let imageUrl = "";
   const render = () => {
     // @TODO: Реализовать страницу добавления поста
     const appHtml = `

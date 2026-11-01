@@ -35,6 +35,8 @@ export const onBackToPostsClick = () => {
   goToPage(POSTS_PAGE);
 };
 
+let attempts = 0;
+
 /**
  * Включает страницу приложения
  */
@@ -63,10 +65,31 @@ export const goToPage = (newPage, data) => {
           page = POSTS_PAGE;
           posts = newPosts;
           renderApp();
+          attempts = 0;
         })
         .catch((error) => {
           console.error(error);
-          goToPage(POSTS_PAGE);
+          attempts++;
+          if (attempts < 3) {
+            goToPage(POSTS_PAGE);
+          } else {
+            attempts = 0;
+
+            const appEl = document.getElementById("app");
+
+            appEl.innerHTML = `
+              <div class="page-container">
+                <h2>Не удалось загрузить посты</h2>
+                <p>Проверьте подключение к интернету.</p>
+                <button id="retry-button">Повторить загрузку</button>
+              </div>
+            `;
+            document
+              .querySelector("#retry-button")
+              .addEventListener("click", () => {
+                goToPage(POSTS_PAGE);
+              });
+          }
         });
     }
 
