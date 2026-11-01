@@ -1,7 +1,7 @@
 // Замени на свой, чтобы получить независимый от других набор данных.
 // "боевая" версия инстапро лежит в ключе prod
-const personalKey = "prod";
-const baseHost = "https://webdev-hw-api.vercel.app";
+const personalKey = "Platina77";
+const baseHost = "https://wedev-api.sky.pro";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
 export function getPosts({ token }) {
@@ -66,4 +66,95 @@ export function uploadImage({ file }) {
   }).then((response) => {
     return response.json();
   });
+}
+
+//Добавляем пост в API
+export function addPost({ token, description, imageUrl }) {
+  return fetch(postsHost, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+    body: JSON.stringify({ description, imageUrl }),
+  }).then((response) => {
+    if (response.status !== 201) {
+      if (response.status === 400) {
+        throw new Error("не передано описание, фотография или описание пустое");
+      }
+      if (response.status === 401) {
+        throw new Error("Пользователь не авторизован");
+      }
+      throw new Error("Ошибка сервера");
+    }
+    return response.json();
+  });
+}
+
+//Ставим лайк
+export function addLike({ token, id }) {
+  return fetch(`${postsHost}/${id}/like`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status !== 200) {
+        /*       if (response.status === 400) {
+        throw new Error("не передано описание, фотография или описание пустое");
+      } */
+        if (response.status === 401) {
+          throw new Error("Авторизуйтесь, пожалуйста");
+        }
+        throw new Error("Ошибка сервера");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      return data.post;
+    });
+}
+
+//Убираем лайк
+export function dislike({ token, id }) {
+  return fetch(`${postsHost}/${id}/dislike`, {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status !== 200) {
+        if (response.status === 401) {
+          throw new Error("Авторизуйтесь, пожалуйста");
+        }
+        throw new Error("Ошибка сервера");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      return data.post;
+    });
+}
+
+export function getUserPosts({ token, id }) {
+  const headers = {};
+
+  if (token !== undefined) {
+    headers.Authorization = token;
+  }
+  return fetch(`${postsHost}/user-posts/${id}`, {
+    method: "GET",
+
+    headers,
+  })
+    .then((response) => {
+      if (response.status !== 200) {
+        throw new Error("Ошибка сервера");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      return data.posts;
+    });
 }

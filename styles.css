@@ -33,7 +33,8 @@
   cursor: pointer;
 }
 
-.logout-button {
+.logout-button,
+.back-button {
   width: 130px;
   text-align: right;
 }

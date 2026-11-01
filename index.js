@@ -1,4 +1,4 @@
-import { getPosts } from "./api.js";
+import { addPost, getPosts, getUserPosts } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
 import {
@@ -20,7 +20,7 @@ export let user = getUserFromLocalStorage();
 export let page = null;
 export let posts = [];
 
-const getToken = () => {
+export const getToken = () => {
   const token = user ? `Bearer ${user.token}` : undefined;
   return token;
 };
@@ -30,6 +30,12 @@ export const logout = () => {
   removeUserFromLocalStorage();
   goToPage(POSTS_PAGE);
 };
+
+export const onBackToPostsClick = () => {
+  goToPage(POSTS_PAGE);
+};
+
+let attempts = 0;
 
 /**
  * Включает страницу приложения
@@ -59,19 +65,47 @@ export const goToPage = (newPage, data) => {
           page = POSTS_PAGE;
           posts = newPosts;
           renderApp();
+          attempts = 0;
         })
         .catch((error) => {
           console.error(error);
-          goToPage(POSTS_PAGE);
+          attempts++;
+          if (attempts < 3) {
+            goToPage(POSTS_PAGE);
+          } else {
+            attempts = 0;
+
+            const appEl = document.getElementById("app");
+
+            appEl.innerHTML = `
+              <div class="page-container">
+                <h2>Не удалось загрузить посты</h2>
+                <p>Проверьте подключение к интернету.</p>
+                <button id="retry-button">Повторить загрузку</button>
+              </div>
+            `;
+            document
+              .querySelector("#retry-button")
+              .addEventListener("click", () => {
+                goToPage(POSTS_PAGE);
+              });
+          }
         });
     }
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      page = LOADING_PAGE;
+      renderApp();
+
+      return getUserPosts({ token: getToken(), id: data.userId }).then(
+        (newPosts) => {
+          console.log("Открываю страницу пользователя: ", data.userId);
+          page = USER_POSTS_PAGE;
+          posts = newPosts;
+          renderApp();
+        },
+      );
     }
 
     page = newPage;
@@ -110,9 +144,16 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       onAddPostClick({ description, imageUrl }) {
-        // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
+        addPost({ token: getToken(), description, imageUrl })
+          .then((data) => {
+            if (data.result === "ok") {
+              console.log("Добавляю пост...", { description, imageUrl });
+              goToPage(POSTS_PAGE);
+            }
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
       },
     });
   }
@@ -125,8 +166,8 @@ const renderApp = () => {
 
   if (page === USER_POSTS_PAGE) {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+
+    return renderPostsPageComponent({ appEl });
   }
 };
 

@@ -1,10 +1,15 @@
-import { goToPage, logout, user } from "../index.js";
-import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from "../routes.js";
+import { goToPage, logout, onBackToPostsClick, page, user } from "../index.js";
+import {
+  ADD_POSTS_PAGE,
+  AUTH_PAGE,
+  POSTS_PAGE,
+  USER_POSTS_PAGE,
+} from "../routes.js";
 
 /**
  * Компонент заголовка страницы.
  * Этот компонент отображает шапку страницы с логотипом, кнопкой добавления постов/входа и кнопкой выхода (если пользователь авторизован).
- * 
+ *
  * @param {HTMLElement} params.element - HTML-элемент, в который будет рендериться заголовок.
  * @returns {HTMLElement} Возвращает элемент заголовка после рендеринга.
  */
@@ -22,6 +27,11 @@ export function renderHeaderComponent({ element }) {
           : "Войти"
       }
       </button>
+      ${
+        page !== POSTS_PAGE
+          ? `<button class="header-button back-button">Назад к ленте</button>`
+          : ""
+      }  
       ${
         user
           ? `<button title="${user.name}" class="header-button logout-button">Выйти</button>`
@@ -57,7 +67,23 @@ export function renderHeaderComponent({ element }) {
    * Обработчик клика по кнопке "Выйти".
    * Если кнопка существует (т.е. пользователь авторизован), вызывает функцию `logout`.
    */
-  element.querySelector(".logout-button")?.addEventListener("click", logout);
+
+  const logoutButtonEl = element.querySelector(".logout-button");
+
+  if (logoutButtonEl !== null) {
+    logoutButtonEl.addEventListener("click", logout);
+  }
+
+  /**
+   * Обработчик клика по кнопке "Назад...".
+   * Если кнопка существует (т.е. пользователь назодится на странице автора постов), вызывает функцию `onBackToPostsClick`.
+   */
+
+  const backButtonEl = element.querySelector(".back-button");
+
+  if (backButtonEl !== null) {
+    backButtonEl.addEventListener("click", onBackToPostsClick);
+  }
 
   return element;
 }

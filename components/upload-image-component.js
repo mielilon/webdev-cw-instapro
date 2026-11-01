@@ -19,7 +19,7 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
 
   /**
    * Функция рендеринга компонента.
-   * Отображает интерфейс компонента в зависимости от состояния: 
+   * Отображает интерфейс компонента в зависимости от состояния:
    * либо форма выбора файла, либо превью загруженного изображения с кнопкой замены.
    */
   const render = () => {
@@ -32,47 +32,55 @@ export function renderUploadImageComponent({ element, onImageUrlChange }) {
               <img class="file-upload-image" src="${imageUrl}" alt="Загруженное изображение">
               <button class="file-upload-remove-button button">Заменить фото</button>
             </div>
+            <br>
             `
             : `
             <label class="file-upload-label secondary-button">
               <input
                 type="file"
                 class="file-upload-input"
-                style="display:none"
+                /* style="display:none" */
               />
               Выберите фото
             </label>
+            <br>
           `
         }
       </div>
     `;
-
-    // Обработчик выбора файла
-    const fileInputElement = element.querySelector(".file-upload-input");
-    fileInputElement?.addEventListener("change", () => {
-      const file = fileInputElement.files[0];
-      if (file) {
-        const labelEl = document.querySelector(".file-upload-label");
-        labelEl.setAttribute("disabled", true);
-        labelEl.textContent = "Загружаю файл...";
-        
-        // Загружаем изображение с помощью API
-        uploadImage({ file }).then(({ fileUrl }) => {
-          imageUrl = fileUrl; // Сохраняем URL загруженного изображения
-          onImageUrlChange(imageUrl); // Уведомляем о изменении URL изображения
-          render(); // Перерисовываем компонент с новым состоянием
+    if (imageUrl) {
+      // Обработчик удаления изображения
+      element
+        .querySelector(".file-upload-remove-button")
+        .addEventListener("click", () => {
+          imageUrl = ""; // Сбрасываем URL изображения
+          onImageUrlChange(imageUrl); // Уведомляем об изменении URL изображения
+          render(); // Перерисовываем компонент
         });
-      }
-    });
+    } else {
+      // Обработчик выбора файла
+      const fileInputElement = element.querySelector(".file-upload-input");
+      fileInputElement.addEventListener("change", () => {
+        const file = fileInputElement.files[0];
+        if (file) {
+          const labelEl = document.querySelector(".file-upload-label");
+          labelEl.setAttribute("disabled", true);
+          labelEl.textContent = "Загружаю файл...";
 
-    // Обработчик удаления изображения
-    element
-      .querySelector(".file-upload-remove-button")
-      ?.addEventListener("click", () => {
-        imageUrl = ""; // Сбрасываем URL изображения
-        onImageUrlChange(imageUrl); // Уведомляем об изменении URL изображения
-        render(); // Перерисовываем компонент
+          // Загружаем изображение с помощью API
+          uploadImage({ file })
+            .then((data) => {
+              imageUrl = data.fileUrl; // Сохраняем URL загруженного изображения
+              onImageUrlChange(imageUrl); // Уведомляем о изменении URL изображения
+              render(); // Перерисовываем компонент с новым состоянием
+            })
+            .finally(() => {
+              labelEl.setAttribute("disabled", false);
+              labelEl.textContent = "Выберите фото";
+            });
+        }
       });
+    }
   };
 
   // Инициализация компонента
