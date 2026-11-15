@@ -31,9 +31,6 @@ export const logout = () => {
   goToPage(POSTS_PAGE);
 };
 
-/**
- * Включает страницу приложения
- */
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -45,7 +42,6 @@ export const goToPage = (newPage, data) => {
     ].includes(newPage)
   ) {
     if (newPage === ADD_POSTS_PAGE) {
-      /* Если пользователь не авторизован, то отправляем его на страницу авторизации перед добавлением поста */
       page = user ? ADD_POSTS_PAGE : AUTH_PAGE;
       return renderApp();
     }
@@ -68,10 +64,36 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      page = LOADING_PAGE;
+      renderApp();
+
+      return fetch(
+        `https://wedev-api.sky.pro/api/v1/prod/instapro/user-posts/${data.userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: getToken(),
+          },
+        },
+      )
+        .then((response) => {
+          if (response.status === 401) {
+            throw new Error("Нет авторизации");
+          }
+
+          return response.json();
+        })
+        .then((data) => {
+          page = USER_POSTS_PAGE;
+          posts = data.posts;
+          renderApp();
+        })
+        .catch((error) => {
+          console.error(error);
+          page = USER_POSTS_PAGE;
+          posts = [];
+          renderApp();
+        });
     }
 
     page = newPage;
@@ -85,6 +107,37 @@ export const goToPage = (newPage, data) => {
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
+
+  const onLikeClick = ({ postId, isLiked }) => {
+    const action = isLiked ? "dislike" : "like";
+
+    return fetch(
+      `https://wedev-api.sky.pro/api/v1/prod/instapro/${postId}/${action}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: getToken(),
+        },
+      },
+    )
+      .then((response) => {
+        if (response.status === 401) {
+          throw new Error("Нет авторизации");
+        }
+
+        if (!response.ok) {
+          throw new Error("Не удалось обновить лайк");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        posts = posts.map((post) =>
+          String(post.id) === String(postId) ? data.post : post,
+        );
+        renderApp();
+      });
+  };
   if (page === LOADING_PAGE) {
     return renderLoadingPageComponent({
       appEl,
@@ -111,8 +164,23 @@ const renderApp = () => {
       appEl,
       onAddPostClick({ description, imageUrl }) {
         // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
+        return fetch("https://wedev-api.sky.pro/api/v1/prod/instapro", {
+          method: "POST",
+          headers: {
+            Authorization: getToken(),
+          },
+          body: JSON.stringify({ description, imageUrl }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Не удалось добавить публикацию");
+            }
+
+            return response.json();
+          })
+          .then(() => {
+            goToPage(POSTS_PAGE);
+          });
       },
     });
   }
@@ -120,13 +188,16 @@ const renderApp = () => {
   if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
+      onLikeClick,
     });
   }
 
   if (page === USER_POSTS_PAGE) {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+    return renderPostsPageComponent({
+      appEl,
+      onLikeClick,
+    });
   }
 };
 
